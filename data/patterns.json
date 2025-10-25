@@ -1,0 +1,7 @@
+[
+  { "id": "market-tote",       "title": "Everyday Market Tote",  "img": "hero-market-tote.jpg",    "category": "fashion", "addedAt": "2025-10-01" },
+  { "id": "lavender-throw",    "title": "Lavender Cloud Throw",  "img": "hero-lavender-throw.jpg", "category": "home",    "addedAt": "2025-09-15" },
+  { "id": "granny-square-101", "title": "Granny Square 101",     "img": "hero-granny-square.jpg",  "category": "fashion", "addedAt": "2025-08-30" },
+  { "id": "everyday-beanie",   "title": "Everyday Beanie",       "img": "hero-beanie.jpg",         "category": "fashion", "addedAt": "2025-08-10" },
+  { "id": "ripple-throw",      "title": "Ripple Throw",          "img": "hero-ripple-throw.jpg",   "category": "home",    "addedAt": "2025-07-21" }
+]

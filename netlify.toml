@@ -1,0 +1,8 @@
+[build]
+  functions = "netlify/functions"
+  publish   = "library"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
