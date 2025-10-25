@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Crochet Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent:#D63384;
+      --green:#0BA96D;
+      --text:#111827;
+      --muted:#6b7280;
+      --card:#fff;
+      --radius:16px;
+      --header-h:64px;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:"DM Sans","Poppins",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif; color:var(--text); background:#F7F7F7; }
+    header{ position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid #e9e9ee; height:var(--header-h); }
+    .container{ max-width:1280px; margin:0 auto; padding:0 24px; height:100%; display:flex; align-items:center; gap:16px; }
+    .logo-only{ width:28px; height:28px; border-radius:8px; background:var(--accent); box-shadow:0 0 0 8px rgba(214,51,132,.18) inset; flex:0 0 auto; }
+    .searchbar{ display:flex; align-items:center; gap:8px; flex:1; }
+    .searchbar input{ flex:1; padding:12px 14px; border-radius:12px; border:1px solid #e8e8ef; outline:none; font-size:15px; transition:border-color .2s, box-shadow .2s; }
+    .searchbar input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px rgba(214,51,132,.15); }
+    .icon-btn{ width:44px; height:44px; border-radius:12px; border:1px solid #e8e8ef; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:box-shadow .2s, border-color .2s, transform .05s; }
+    .icon-btn:hover{ border-color:#ddd; box-shadow:0 6px 14px rgba(0,0,0,.06); }
+    .icon-btn:active{ transform:scale(.98); }
+
+    main{ max-width:1280px; margin:0 auto; padding:0 24px 80px; }
+
+    .hero-carousel{ position:relative; height:68vh; min-height:460px; border-radius:24px; overflow:hidden; margin-top:18px; box-shadow:0 12px 32px rgba(0,0,0,0.07); }
+    .slide{ position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity 1.5s ease-in-out; }
+    .slide.is-active{ opacity:1; }
+    .slide::after{ content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,0) 60%, rgba(255,255,255,0.9) 100%); pointer-events:none; transition:background .4s ease; }
+    .hero-content{ position:absolute; left:40px; bottom:40px; z-index:2; color:#111; max-width:720px; }
+    .kicker{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:#ffd8eb; color:#D63384; font-weight:800; }
+    .hero-title{ margin:10px 0 8px; font-size:44px; font-weight:900; letter-spacing:.2px; }
+    .hero-desc{ margin:0 0 16px; color:#374151; }
+    .hero-ctas{ display:flex; gap:10px; }
+    .btn{ padding:12px 16px; border-radius:12px; border:0; font-weight:800; cursor:pointer; }
+    .btn-primary{ background:var(--accent); color:#fff; }
+    .btn-ghost{ background:transparent; color:var(--accent); border:2px solid var(--accent); }
+    .hero-arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:3; width:44px; height:44px; border-radius:999px; background:#fff; border:1px solid #eee; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+    .hero-arrow.left{ left:14px; } .hero-arrow.right{ right:14px; }
+    .dots{ position:absolute; left:40px; bottom:16px; z-index:3; display:flex; gap:6px; }
+    .dot{ width:8px; height:8px; border-radius:50%; background:#e6d1dc; }
+    .dot.is-active{ background:#fff; box-shadow:0 0 0 4px rgba(255,255,255,.28); }
+
+    .section{ margin:28px 0; }
+    .section h2{ margin:0 0 12px; font-size:20px; font-weight:900; display:flex; align-items:center; gap:8px; }
+    .rail{ position:relative; display:grid; grid-auto-flow:column; grid-auto-columns:220px; gap:14px; overflow-x:auto; padding:6px 2px; scroll-snap-type:x mandatory; }
+    .arrow-rail{ position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:999px; border:1px solid #eee; background:#fff; color:#222; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,.08); cursor:pointer; }
+    .arrow-rail.left{ left:-10px; } .arrow-rail.right{ right:-10px; }
+
+    .card{ scroll-snap-align:start; position:relative; border-radius:var(--radius); background:var(--card); box-shadow:0 4px 20px rgba(0,0,0,.05); overflow:hidden; }
+    .card img{ width:100%; height:140px; object-fit:cover; display:block; }
+    .meta{ padding:10px 12px; }
+    .title{ font-weight:800; font-size:14px; line-height:1.3; }
+    .tag{ display:inline-block; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:800; background:#f1f5f9; color:#6b7280; margin-bottom:6px; }
+
+    .actions{ position:absolute; top:8px; right:8px; display:flex; gap:6px; background:rgba(255,255,255,.8); border:1px solid #eee; padding:6px; border-radius:999px; backdrop-filter: blur(6px); }
+    .reel-btn{ width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid #ececf5; background:#fff; color:#222; cursor:pointer; transition:all .2s ease; }
+    .reel-btn:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,.08); }
+    .reel-btn svg{ transition: all .2s ease; }
+    .reel-btn[data-action="save"].is-saved{ color:var(--accent); border-color:var(--accent); }
+    .reel-btn[data-action="start"].is-started{ color:var(--green); border-color:var(--green); }
+
+    #continueCrocheting, #patternFavorites{ opacity:0; transition:opacity .3s ease; display:none; }
+    #patternFavorites{ margin-top:40px; }
+
+    footer{ border-top:1px solid #eee; padding:12px 24px; color:var(--muted); }
+
+    #searchResults h2{ position: sticky; top: calc(var(--header-h) + 0px); background:#fff; padding:8px 0; z-index: 20; border-bottom:1px solid #f6f6f9; }
+    .back-home{ margin-left:auto; display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; border:1px solid #e8e8ef; background:#fff; color:#111; cursor:pointer; font-weight:700; }
+    .muted{ color:var(--muted); font-size:13px; }
+  
+    /* Home Request Pattern box */
+    #requestSectionHome{
+      margin:28px 0 12px;
+    }
+    .request-box{
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 4px 20px rgba(0,0,0,.05);
+      max-width:720px;
+    }
+    .request-box h3{
+      margin:0 0 6px; font-size:20px; font-weight:900;
+    }
+    .request-box p{ margin:0 0 12px; color:#6b7280; }
+    .request-box input{
+      width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;
+      font-size:14px;
+    }
+    .request-box button{
+      background:#D63384; color:#fff; font-weight:700; border:none; border-radius:8px; padding:10px 16px; cursor:pointer;
+    }
+
+
+    /* ===== Responsive hero tweaks ===== */
+    @media (max-width: 600px){
+      .hero-carousel{ height:60vh; min-height:420px; }
+      .hero-content{ left:20px; right:20px; bottom:24px; max-width:100%; }
+      .kicker{ font-size:12px; padding:5px 9px; }
+      .hero-title{ font-size:28px; line-height:1.15; margin-bottom:6px; }
+      .hero-desc{ font-size:14px; line-height:1.4; margin-bottom:12px; }
+      .hero-ctas{ flex-direction:column; gap:8px; }
+      .hero-ctas .btn{ width:100%; padding:12px 14px; }
+    }
+    @media (max-width: 380px){
+      .hero-carousel{ height:56vh; min-height:380px; }
+      .hero-title{ font-size:24px; }
+      .hero-desc{ font-size:13px; }
+      .kicker{ font-size:11px; }
+    }
+
+
+    /* --- Carousel dots: subtle fade + stacking-safe mobile position --- */
+    .dots { z-index: 4; }           /* above the hero buttons */
+    .dot { opacity: .4; }           /* inactive fade */
+    .dot.is-active { opacity: 1; }  /* active = full opacity */
+
+    /* Center dots on mobile and nudge them below the stacked buttons */
+    @media (max-width: 600px){
+      .dots{
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 12px;
+      }
+    }
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <img src="logo-icon.png" alt="Logo" class="logo-only" />
+      <div class="searchbar">
+        <input id="searchInput" type="text" placeholder="Search patterns, vibes, stitches…" />
+        <button id="searchBtn" class="icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-carousel" id="hero">
+      <button class="hero-arrow left" data-hero-left>‹</button>
+      <button class="hero-arrow right" data-hero-right>›</button>
+      <div class="hero-content">
+        <span class="kicker">Trending · Fashion</span>
+        <h2 class="hero-title" id="heroTitle">Everyday Market Tote</h2>
+        <p class="hero-desc" id="heroDesc">Light, sturdy, and stylish for mornings at the market.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" id="heroStart" data-title="Everyday Market Tote">Start Pattern</button>
+          <button class="btn btn-ghost" id="heroSave" data-title="Everyday Market Tote">Save Pattern</button>
+        </div>
+      </div>
+      <div class="dots" id="heroDots"></div>
+    </section>
+
+    <section id="searchResults" class="section" style="display:none;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h2 style="margin:0;">🔎 Search Results</h2>
+        <button id="backHome" class="back-home" title="Back to home">← Home</button>
+      </div>
+      <div class="rail" id="resultsRail"></div>
+      <p id="resultsEmpty" class="muted" style="display:none; margin-top:8px;">
+        Sorry, we couldn’t find any patterns matching your search.<br>
+        💡 If you don't find the pattern you searched for in the library, you can request it below and we’ll try to make it available soon 💕
+      </p>
+      <form name="patternRequest" method="POST" data-netlify="true" id="patternRequestForm" style="display:none; margin-top:14px; max-width:420px;">
+        <input type="hidden" name="form-name" value="patternRequest"/>
+        <input type="text" name="patternName" id="patternName" placeholder="Pattern name" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;"/>
+        <input type="email" name="email" id="patternEmail" placeholder="Your email (optional)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:8px;"/>
+        <button type="submit" style="background:#D63384; color:#fff; font-weight:700; border:none; border-radius:8px; padding:10px 16px; cursor:pointer;">Request Pattern</button>
+      </form>
+      <p id="patternThanks" style="display:none; color:#D63384; font-weight:600; margin-top:10px;">✨ Thank you! We’ll review your request soon.</p>
+    </section>
+
+    <section id="continueCrocheting" class="section">
+      <h2>🧵 Continue Crocheting</h2>
+      <div class="rail" id="continueRail"></div>
+    </section>
+
+    <section id="patternFavorites" class="section">
+      <h2>⭐ Your Saved Patterns</h2>
+      <div class="rail" id="favoritesRail"></div>
+    </section>
+
+    <section id="sectionEasy" class="section">
+      <h2>✨ Start Here — Easy Projects</h2>
+      <div class="rail" id="railEasy"><button class="arrow-rail left" data-left>‹</button><button class="arrow-rail right" data-right>›</button></div>
+    </section>
+
+    <section id="sectionHome" class="section">
+      <h2>🏡 Make Your Home Beautiful</h2>
+      <div class="rail" id="railHome"><button class="arrow-rail left" data-left>‹</button><button class="arrow-rail right" data-right>›</button></div>
+    </section>
+
+    <section id="sectionFashion" class="section">
+      <h2>👜 Wear It Proud — Fashion</h2>
+      <div class="rail" id="railFashion"><button class="arrow-rail left" data-left>‹</button><button class="arrow-rail right" data-right>›</button></div>
+    </section>
+
+    <section id="sectionToys" class="section">
+      <h2>🧸 Amigurumi &amp; Toys</h2>
+      <div class="rail" id="railToys"><button class="arrow-rail left" data-left>‹</button><button class="arrow-rail right" data-right>›</button></div>
+    </section>
+
+    <!-- 📝 Request Pattern (Home) -->
+    <section id="requestSectionHome" class="section">
+      <div class="request-box">
+        <h3>Didn't find the project pattern you were looking for?</h3>
+        <p>If you don't find the pattern you searched for in the library, you can request it below and we’ll try to make it available soon 💕</p>
+        <form name="patternRequest" method="POST" data-netlify="true" id="patternRequestFormHome">
+          <input type="hidden" name="form-name" value="patternRequest"/>
+          <input type="text" name="patternName" id="patternNameHome" placeholder="Pattern name" required />
+          <input type="email" name="email" id="patternEmailHome" placeholder="Your email (optional)" />
+          <button type="submit">Request Pattern</button>
+        </form>
+        <p id="patternThanksHome" style="display:none; color:#D63384; font-weight:600; margin-top:10px;">✨ Thank you! We’ll review your request soon.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© Crochet Library</footer>
+
+  <script>
+  (function(){
+    const KEY_CONT = 'hh_inprogress';
+    const KEY_SAVE = 'hh_saved';
+    const getJSON = (k,d)=>{ try{ return JSON.parse(localStorage.getItem(k) || JSON.stringify(d)); } catch(_) { return d; } };
+    const setJSON = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+
+    const heroSlides = [
+      { title:'Everyday Market Tote', desc:'Light, sturdy, and stylish for mornings at the market.', img:'hero-market-tote.jpg' },
+      { title:'Lavender Cloud Throw', desc:'Soft textures and dreamy rows — a comfort classic.', img:'hero-lavender-throw.jpg' },
+      { title:'Granny Square 101', desc:'Build a timeless tote from colorful squares.', img:'hero-granny-square.jpg' },
+      { title:'Everyday Beanie', desc:'Simple, cozy, and perfect for beginners.', img:'hero-beanie.jpg' },
+      { title:'Ripple Throw', desc:'A relaxing repeat that looks amazing on any couch.', img:'hero-ripple-throw.jpg' }
+    ];
+    window.heroSlides = heroSlides;
+
+    const hero = document.getElementById('hero');
+    const heroDots = document.getElementById('heroDots');
+    const titleEl = document.getElementById('heroTitle');
+    const descEl  = document.getElementById('heroDesc');
+    const heroStart = document.getElementById('heroStart');
+    const heroSave  = document.getElementById('heroSave');
+    let current = 0; let slidesEls = [];
+
+    function mountHero(){
+      heroSlides.forEach((s,i)=>{
+        const d=document.createElement('div');
+        d.className='slide'+(i===0?' is-active':'');
+        d.style.backgroundImage=`url('${s.img}')`;
+        hero.appendChild(d);
+        slidesEls.push(d);
+        const dot=document.createElement('span');
+        dot.className='dot'+(i===0?' is-active':'');
+        dot.dataset.i=i; heroDots.appendChild(dot);
+      });
+      updateHero(0);
+    }
+    function updateHero(i){
+      current = (i+heroSlides.length)%heroSlides.length;
+      slidesEls.forEach((el,idx)=> el.classList.toggle('is-active', idx===current));
+      [...heroDots.children].forEach((d,idx)=> d.classList.toggle('is-active', idx===current));
+      const s=heroSlides[current];
+      titleEl.textContent=s.title; descEl.textContent=s.desc;
+      heroStart.dataset.title=s.title; heroSave.dataset.title=s.title;
+      heroStart.dataset.img=s.img; heroSave.dataset.img=s.img;
+    }
+    document.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-hero-left]')){ const ev = new Event('heroNext'); hero.dispatchEvent(ev); updateHero(current-1); }
+      if(e.target.closest('[data-hero-right]')){ const ev = new Event('heroNext'); hero.dispatchEvent(ev); updateHero(current+1); }
+      const dot=e.target.closest('.dot'); if(dot){ const ev = new Event('heroNext'); hero.dispatchEvent(ev); updateHero(parseInt(dot.dataset.i,10)); }
+    });
+
+    const svgSaveOutline = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12a2 2 0 0 1 2 2v18l-8-4-8 4V4a2 2 0 0 1 2-2z"/></svg>';
+    const svgSaveFilled  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12a2 2 0 0 1 2 2v18l-8-4-8 4V4a2 2 0 0 1 2-2z"/></svg>';
+
+    function cardHTML(it){
+      const saved = getJSON(KEY_SAVE,[]).some(x=>x.title===it.title);
+      const started = getJSON(KEY_CONT,[]).some(x=>x.title===it.title);
+      return `<article class="card" data-title="${it.title}">
+        <img src="${it.img}" alt="${it.title}">
+        <div class="actions">
+          <button class="reel-btn ${saved?'is-saved':''}" data-action="save" aria-label="Save">${saved?svgSaveFilled:svgSaveOutline}</button>
+          <button class="reel-btn ${started?'is-started':''}" data-action="start" aria-label="Start">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
+          </button>
+        </div>
+        <div class="meta"><div class="title">${it.title}</div></div>
+      </article>`;
+    }
+
+    function renderRailById(id, list){
+      const rail=document.getElementById(id);
+      if(!rail) return;
+      const arrows = rail.querySelectorAll('.arrow-rail');
+      rail.innerHTML = (arrows[0]?.outerHTML || '<button class="arrow-rail left" data-left>‹</button>')
+                     + (arrows[1]?.outerHTML || '<button class="arrow-rail right" data-right>›</button>')
+                     + list.map(cardHTML).join('');
+    }
+
+    function p(t, img){ return {title:t, img:img}; }
+    const imgs = {
+      cozy:'warm-mug-cozy.jpg',
+      yarn:'starter-dishcloth.jpg',
+      basket:'chunky-basket.jpg',
+      squares:'first-granny-square.jpg',
+      hat:'beginner-beanie-hat.jpg',
+      scarf:'easy-ribbed-scarf.jpg',
+      toy:'bunny-friend.jpg',
+      fashion:'market-tote.jpg',
+      home:'pillow-covers.jpg',
+      throw:'ripple-throw.jpg'
+    };
+
+    const railEasy = [ p('Easy Ribbed Scarf', 'easy-ribbed-scarf.jpg'), p('Sunrise Coasters', 'sunrise-coasters.jpg'), p('Quiet Washcloth', 'quiet-washcloth.jpg'), p('Beginner Beanie Hat', 'beginner-beanie-hat.jpg'), p('Warm Mug Cozy', 'warm-mug-cozy.jpg'), p('Starter Dishcloth', 'starter-dishcloth.jpg'), p('First Granny Square', 'first-granny-square.jpg'), p('Quick Phone Pouch', 'quick-phone-pouch.jpg'), p('Simple Headband', 'simple-headband.jpg'), p('Mini Plant Cozy', 'mini-plant-cozy.jpg') ];
+    const railHome = [ p('Chunky Basket', 'chunky-basket.jpg'), p('Ripple Throw', 'ripple-throw.jpg'), p('Pillow Covers', 'pillow-covers.jpg'), p('Table Runner', 'table-runner.jpg'), p('Storage Bins', 'storage-bins.jpg'), p('Fringed Cushion', 'fringed-cushion.jpg'), p('Window Valance', 'window-valance.jpg'), p('Door Mat Weave', 'door-mat-weave.jpg'), p('Chair Socks', 'chair-socks.jpg'), p('Heirloom Blanket', 'heirloom-blanket.jpg') ];
+    const railFashion = [ p('Granny Square Tote', 'granny-square-tote.jpg'), p('Cable Beanie', 'cable-beanie.jpg'), p('Market Tote', 'market-tote.jpg'), p('Summer Shawl', 'summer-shawl.jpg'), p('Fingerless Gloves', 'fingerless-gloves.jpg'), p('Bralette Top', 'bralette-top.jpg'), p('Cozy Cardigan', 'cozy-cardigan.jpg'), p('Headwrap Twist', 'headwrap-twist.jpg'), p('Boho Belt', 'boho-belt.jpg'), p('Pocket Scarf', 'pocket-scarf.jpg') ];
+    const railToys = [ p('Bunny Friend', 'bunny-friend.jpg'), p('Bear Cub', 'bear-cub.jpg'), p('Little Dino', 'little-dino.jpg'), p('Octo Buddy', 'octo-buddy.jpg'), p('Kitty Plush', 'kitty-plush.jpg'), p('Fox Pal', 'fox-pal.jpg'), p('Whale Mini', 'whale-mini.jpg'), p('Giraffe Tiny', 'giraffe-tiny.jpg'), p('Penguin Pip', 'penguin-pip.jpg'), p('Elephant Ellie', 'elephant-ellie.jpg') ];
+
+    window.railEasy = railEasy; window.railHome=railHome; window.railFashion=railFashion; window.railToys=railToys;
+
+    function renderRail(secId, railId, items){
+      const sec = document.getElementById(secId);
+      const rail = document.getElementById(railId);
+      if(!sec || !rail) return;
+      if(!items.length){
+        sec.style.opacity=0; setTimeout(()=>{ sec.style.display='none'; rail.innerHTML=''; }, 0); return;
+      }
+      rail.innerHTML = items.map(cardHTML).join('');
+      sec.style.display='grid'; sec.style.opacity=1;
+    }
+
+    function paintButtons(){
+      document.querySelectorAll('.reel-btn[data-action="save"]').forEach(btn=>{
+        const card = btn.closest('[data-title], .card, article');
+        const title = card?.getAttribute('data-title') || card?.querySelector('.title')?.textContent?.trim() || 'Pattern';
+        const saved = getJSON(KEY_SAVE,[]).some(x=>x.title===title);
+        btn.classList.toggle('is-saved', saved);
+        btn.innerHTML = saved ? svgSaveFilled : svgSaveOutline;
+      });
+      document.querySelectorAll('.reel-btn[data-action="start"]').forEach(btn=>{
+        const card = btn.closest('[data-title], .card, article');
+        const title = card?.getAttribute('data-title') || card?.querySelector('.title')?.textContent?.trim() || 'Pattern';
+        const started = getJSON(KEY_CONT,[]).some(x=>x.title===title);
+        btn.classList.toggle('is-started', started);
+      });
+    }
+    window.paintButtons = paintButtons;
+
+    function getCardInfo(el){
+      const card = el.closest('[data-title], .card, article'); if(!card) return null;
+      const title = card.getAttribute('data-title') || card.querySelector('.title')?.textContent?.trim() || 'Pattern';
+      const img = card.querySelector('img')?.getAttribute('src') || '';
+      return {title,img};
+    }
+
+    function toggleStart(btn){
+      const info = getCardInfo(btn); if(!info) return;
+      let started = getJSON(KEY_CONT,[]);
+      const i = started.findIndex(x=>x.title===info.title);
+      if(i === -1) started.unshift(info); else started.splice(i,1);
+      setJSON(KEY_CONT, started); paintButtons(); renderDynamicSections();
+    }
+    function toggleSave(btn){
+      const info = getCardInfo(btn); if(!info) return;
+      let saved = getJSON(KEY_SAVE,[]);
+      const i = saved.findIndex(x=>x.title===info.title);
+      if(i === -1) saved.unshift(info); else saved.splice(i,1);
+      setJSON(KEY_SAVE, saved); paintButtons(); renderDynamicSections();
+    }
+
+    function renderDynamicSections(){
+      const started = getJSON(KEY_CONT,[]);
+      const saved   = getJSON(KEY_SAVE,[]);
+      renderRail('continueCrocheting','continueRail', started);
+      renderRail('patternFavorites','favoritesRail', saved);
+    }
+
+    document.addEventListener('click', (e)=>{
+      const left = e.target.closest('[data-left]'); const right=e.target.closest('[data-right]');
+      if(left || right){ const rail=(left||right).parentElement; rail.scrollBy({left:(left?-1:1)*300, behavior:'smooth'}); }
+      const saveBtn = e.target.closest('.reel-btn[data-action="save"]');
+      const startBtn = e.target.closest('.reel-btn[data-action="start"]');
+      if(saveBtn) toggleSave(saveBtn);
+      if(startBtn) toggleStart(startBtn);
+      if(e.target.closest('#heroStart')){
+        const t = heroStart.dataset.title, img = heroStart.dataset.img || heroSlides[current].img;
+        let s = getJSON(KEY_CONT,[]); if(!s.find(x=>x.title===t)) { s.unshift({title:t,img}); setJSON(KEY_CONT,s); }
+        paintButtons(); renderDynamicSections();
+      }
+      if(e.target.closest('#heroSave')){
+        const t = heroSave.dataset.title, img = heroSave.dataset.img || heroSlides[current].img;
+        let s = getJSON(KEY_SAVE,[]); const i=s.findIndex(x=>x.title===t); if(i===-1) s.unshift({title:t,img}); else s.splice(i,1);
+        setJSON(KEY_SAVE,s); paintButtons(); renderDynamicSections();
+      }
+    }, true);
+
+    function init(){
+      const input = document.getElementById('searchInput');
+      if(input) { input.focus(); input.select?.(); }
+      mountHero();
+      renderRailById('railEasy', railEasy);
+      renderRailById('railHome', railHome);
+      renderRailById('railFashion', railFashion);
+      renderRailById('railToys', railToys);
+      paintButtons();
+      renderDynamicSections();
+    }
+    document.addEventListener('DOMContentLoaded', init);
+  })();
+  </script>
+
+  <script>
+  (function(){
+    const hero = document.getElementById('hero');
+    if(!hero) return;
+    let isPaused = False;
+  })();
+  </script>
+
+  <script>
+  (function(){
+    const hero = document.getElementById('hero');
+    if(!hero) return;
+    let isPaused = false;
+    let resumeTimer = null;
+    const slideDuration = 7000;
+    let progress = hero.querySelector('.hero-progress');
+    if(!progress){
+      progress = document.createElement('div');
+      progress.className = 'hero-progress';
+      hero.appendChild(progress);
+    }
+    function startBar(){
+      progress.style.transition = 'none';
+      progress.style.opacity = '.3';
+      progress.style.width = '0%';
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          progress.style.transition = `width ${slideDuration/1000}s linear, opacity .35s ease`;
+          progress.style.width = '100%';
+        });
+      });
+    }
+    function fadeOutBar(){ progress.style.opacity = '0'; }
+    hero.addEventListener('heroNext', ()=>{ fadeOutBar(); setTimeout(startBar, 380); });
+    hero.addEventListener('mouseenter', ()=>{
+      isPaused = true;
+      const w = getComputedStyle(progress).width;
+      progress.style.transition = 'none';
+      progress.style.width = w;
+    });
+    hero.addEventListener('mouseleave', ()=>{
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(()=>{ isPaused = false; startBar(); }, 2000);
+    });
+    setInterval(()=>{
+      if(!isPaused){
+        const ev = new Event('heroNext');
+        hero.dispatchEvent(ev);
+        const right = hero.querySelector('[data-hero-right]');
+        if(right) right.click();
+      }
+    }, slideDuration);
+    startBar();
+  })();
+  </script>
+
+  <script>
+  (function(){
+    function el(id){ return document.getElementById(id); }
+    const input = el('searchInput');
+    const btn   = el('searchBtn');
+    const sec   = el('searchResults');
+    const rail  = el('resultsRail');
+    const empty = el('resultsEmpty');
+    const back  = el('backHome');
+    const form  = el('patternRequestForm');
+    const thanks= el('patternThanks');
+
+    const homeParts = [
+      el('hero'), el('continueCrocheting'), el('patternFavorites'),
+      el('sectionEasy'), el('sectionHome'), el('sectionFashion'), el('sectionToys')
+    ];
+
+    function hideHomeInstant(){ homeParts.forEach(p=>{ if(p){ p.style.display='none'; p.style.opacity=0; } }); }
+    function showHomeInstant(){ homeParts.forEach(p=>{ if(p){ p.style.display=''; p.style.opacity=1; } }); }
+
+    function dedupe(list){ const seen=new Set(); const out=[]; list.forEach(it=>{ if(!seen.has(it.title)){ seen.add(it.title); out.push(it); } }); return out; }
+
+    function buildCatalog(){
+      const datasets=[...(window.railEasy||[]),...(window.railHome||[]),...(window.railFashion||[]),...(window.railToys||[])];
+      const heroTitle = document.getElementById('heroTitle')?.textContent?.trim();
+      const heroImg = document.querySelector('#hero .slide.is-active')?.style?.backgroundImage?.slice(5,-2) || '';
+      if(heroTitle) datasets.push({title:heroTitle,img:heroImg});
+      return dedupe(datasets);
+    }
+
+    function cardHTML(it){
+      return `<article class="card" data-title="${it.title}">
+        <img src="${it.img}" alt="${it.title}">
+        <div class="actions">
+          <button class="reel-btn" data-action="save" aria-label="Save">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12a2 2 0 0 1 2 2v18l-8-4-8 4V4a2 2 0 0 1 2-2z"/></svg>
+          </button>
+          <button class="reel-btn" data-action="start" aria-label="Start">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
+          </button>
+        </div>
+        <div class="meta"><div class="title">${it.title}</div></div>
+      </article>`;
+    }
+
+    function showResults(items){
+      hideHomeInstant();
+      back.style.display = 'inline-flex';
+      if(!items.length){
+        rail.innerHTML='';
+        empty.style.display='block';
+        form.style.display='block';
+      }else{
+        empty.style.display='none';
+        form.style.display='none';
+        rail.innerHTML = items.map(cardHTML).join('');
+      }
+      sec.style.display='block';
+      try{ if(window.paintButtons) window.paintButtons(); }catch(_){}
+    }
+
+    function clearResults(){
+      sec.style.display='none'; rail.innerHTML=''; empty.style.display='none'; form.style.display='none'; thanks.style.display='none';
+      back.style.display='none';
+      showHomeInstant();
+    }
+
+    function doSearch(){
+      const q=(input.value||'').trim().toLowerCase();
+      if(!q){ clearResults(); return; }
+      const catalog=buildCatalog();
+      const matches=catalog.filter(it => it.title.toLowerCase().includes(q));
+      showResults(matches);
+    }
+
+    if(btn) btn.addEventListener('click', doSearch);
+    if(input){
+      input.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter'){ doSearch(); }
+        if(e.key==='Escape'){ input.value=''; clearResults(); }
+      });
+    }
+    if(back){
+      back.addEventListener('click', ()=>{
+        input.value=''; clearResults();
+        input.focus();
+      });
+    }
+
+    if(form){
+      form.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        const data = new FormData(form);
+        fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString() })
+        .then(()=>{ form.style.display='none'; thanks.style.display='block'; })
+        .catch(()=>{ form.style.display='none'; thanks.textContent='Something went wrong — please try again later 💕'; thanks.style.display='block'; });
+      });
+    }
+  })();
+  </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const formHome = document.getElementById('patternRequestFormHome');
+  const thanksHome = document.getElementById('patternThanksHome');
+  if(formHome){
+    formHome.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = new FormData(formHome);
+      fetch('/', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(data).toString()
+      }).then(()=>{
+        formHome.style.display='none';
+        thanksHome.style.display='block';
+      }).catch(()=>{
+        formHome.style.display='none';
+        thanksHome.textContent='Something went wrong — please try again later 💕';
+        thanksHome.style.display='block';
+      });
+    });
+  }
+});
+</script>
+
+</body>
+</html>
